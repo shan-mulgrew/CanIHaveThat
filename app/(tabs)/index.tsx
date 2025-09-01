@@ -17,6 +17,21 @@ export default function ScannerScreen() {
   const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     if (scanned) return;
     
+    setScanned(true);
+    
+    try {
+      const food = await getFoodByBarcode(data);
+      if (food) {
+        setScannedFood(food);
+        setShowCamera(false);
+      } else {
+        setScanned(false);
+        Alert.alert(
+          'Food Not Found',
+          'This barcode is not in our database. Try searching manually.'
+        );
+      }
+    } catch (error) {
       setScanned(false);
       Alert.alert(
         'Food Not Found',
