@@ -10,6 +10,7 @@ export interface Food {
   name: string;
   brand: string;
   barcode: string;
+  ingredients: string[];
   allergens: Allergen[];
 }
 
@@ -31,6 +32,17 @@ const MOCK_FOODS: Food[] = [
     name: 'Whole Wheat Bread',
     brand: 'Brennans',
     barcode: '5000169005057',
+    ingredients: [
+      'Wholemeal Wheat Flour',
+      'Water',
+      'Yeast',
+      'Salt',
+      'Wheat Gluten',
+      'Vegetable Fat',
+      'Sugar',
+      'Emulsifiers',
+      'Preservatives'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: true },
       { name: 'Crustaceans', present: false },
@@ -46,6 +58,11 @@ const MOCK_FOODS: Food[] = [
     name: 'Fresh Salmon Fillet',
     brand: 'SuperValu',
     barcode: '5391531234567',
+    ingredients: [
+      'Fresh Atlantic Salmon (Salmo salar)',
+      'Water',
+      'Salt'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },
@@ -61,6 +78,12 @@ const MOCK_FOODS: Food[] = [
     name: 'Natural Greek Yogurt',
     brand: 'Glenisk',
     barcode: '5391520654321',
+    ingredients: [
+      'Organic Whole Milk',
+      'Live Yogurt Cultures',
+      'Lactobacillus bulgaricus',
+      'Streptococcus thermophilus'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },
@@ -76,6 +99,9 @@ const MOCK_FOODS: Food[] = [
     name: 'Organic Free Range Eggs',
     brand: 'Dunnes Stores',
     barcode: '5391533987654',
+    ingredients: [
+      'Organic Free Range Eggs'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },
@@ -91,6 +117,11 @@ const MOCK_FOODS: Food[] = [
     name: 'Peanut Butter',
     brand: 'Whole Earth',
     barcode: '5000169123456',
+    ingredients: [
+      'Roasted Peanuts (95%)',
+      'Sustainable Palm Oil',
+      'Sea Salt'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },
@@ -106,6 +137,15 @@ const MOCK_FOODS: Food[] = [
     name: 'Soy Milk',
     brand: 'Alpro',
     barcode: '5411188123789',
+    ingredients: [
+      'Water',
+      'Hulled Soya Beans (2.9%)',
+      'Sugar',
+      'Calcium Carbonate',
+      'Sea Salt',
+      'Stabilisers',
+      'Vitamins'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },
@@ -121,6 +161,11 @@ const MOCK_FOODS: Food[] = [
     name: 'Fresh Prawns',
     brand: 'Tesco',
     barcode: '5000169999999',
+    ingredients: [
+      'Fresh Water Prawns',
+      'Salt',
+      'Sodium Metabisulphite (Preservative)'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: true },
@@ -136,6 +181,9 @@ const MOCK_FOODS: Food[] = [
     name: 'Organic Bananas',
     brand: 'Fresh & Easy',
     barcode: '5391531111111',
+    ingredients: [
+      'Organic Bananas'
+    ],
     allergens: [
       { name: 'Cereals containing gluten', present: false },
       { name: 'Crustaceans', present: false },

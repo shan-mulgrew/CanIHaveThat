@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Camera, Heart, Shield } from 'lucide-react-native';
+import { Camera, Heart, Shield, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -44,6 +44,15 @@ export default function TabLayout() {
           title: 'Safe Foods',
           tabBarIcon: ({ size, color }) => (
             <Shield size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ size, color }) => (
+            <Settings size={size} color={color} />
           ),
         }}
       />

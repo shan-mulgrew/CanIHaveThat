@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Heart, Shield, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from 'lucide-react-native';
+import { Heart, Shield, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
 import { type Food, toggleFavorite, toggleSafeFood, isInFavorites, isInSafeFoods } from '@/utils/foodDatabase';
+import { getAllergenSettings, type AllergenSettings } from '@/utils/allergenSettings';
 
 interface FoodCardProps {
   food: Food;
@@ -12,6 +14,17 @@ interface FoodCardProps {
 export default function FoodCard({ food, detailed = false, onUpdate }: FoodCardProps) {
   const [isFavorite, setIsFavorite] = useState(isInFavorites(food.id));
   const [isSafe, setIsSafe] = useState(isInSafeFoods(food.id));
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [allergenSettings, setAllergenSettings] = useState<AllergenSettings>({});
+
+  useEffect(() => {
+    loadAllergenSettings();
+  }, []);
+
+  const loadAllergenSettings = async () => {
+    const settings = await getAllergenSettings();
+    setAllergenSettings(settings);
+  };
 
   const handleToggleFavorite = async () => {
     const newState = await toggleFavorite(food);
@@ -26,10 +39,14 @@ export default function FoodCard({ food, detailed = false, onUpdate }: FoodCardP
   };
 
   const getAllergenCount = () => {
-    return food.allergens.filter(a => a.present).length;
+    return food.allergens.filter(a => a.present && allergenSettings[a.name]).length;
   };
 
-  const hasAllergens = getAllergenCount() > 0;
+  const getEnabledAllergens = () => {
+    return food.allergens.filter(a => a.present && allergenSettings[a.name]);
+  };
+
+  const hasEnabledAllergens = getEnabledAllergens().length > 0;
 
   return (
     <View style={styles.card}>
@@ -64,48 +81,87 @@ export default function FoodCard({ food, detailed = false, onUpdate }: FoodCardP
         </View>
       </View>
 
-      <View style={[styles.allergenStatus, hasAllergens ? styles.warningStatus : styles.safeStatus]}>
-        {hasAllergens ? (
+      <View style={[styles.allergenStatus, hasEnabledAllergens ? styles.warningStatus : styles.safeStatus]}>
+        {hasEnabledAllergens ? (
           <>
             <AlertTriangle size={16} color="#EF4444" />
             <Text style={styles.warningText}>
-              Contains {getAllergenCount()} allergen{getAllergenCount() !== 1 ? 's' : ''}
+              Contains {getAllergenCount()} monitored allergen{getAllergenCount() !== 1 ? 's' : ''}
             </Text>
           </>
         ) : (
           <>
             <CheckCircle size={16} color="#10B981" />
-            <Text style={styles.safeText}>No allergens detected</Text>
+            <Text style={styles.safeText}>No monitored allergens detected</Text>
           </>
         )}
       </View>
 
       {detailed && (
+        <>
+          <TouchableOpacity 
+            style={styles.ingredientsToggle}
+            onPress={() => setShowIngredients(!showIngredients)}
+          >
+            <Text style={styles.ingredientsToggleText}>Ingredients</Text>
+            {showIngredients ? (
+              <ChevronUp size={20} color="#6b7280" />
+            ) : (
+              <ChevronDown size={20} color="#6b7280" />
+            )}
+          </TouchableOpacity>
+
+          {showIngredients && (
+            <View style={styles.ingredientsSection}>
+              <View style={styles.ingredientsList}>
+                {food.ingredients.map((ingredient, index) => (
+                  <Text key={index} style={styles.ingredient}>
+                    • {ingredient}
+                  </Text>
+                ))}
+              </View>
+            </View>
+          )}
+
         <View style={styles.allergenDetails}>
-          <Text style={styles.allergenTitle}>Irish Top 7 Allergens:</Text>
-          {food.allergens.map((allergen) => (
+          <Text style={styles.allergenTitle}>Allergen Information:</Text>
+          {food.allergens.map((allergen) => {
+            const isEnabled = allergenSettings[allergen.name];
+            const showWarning = allergen.present && isEnabled;
+            
+            return (
             <View 
               key={allergen.name} 
               style={[
                 styles.allergenItem,
-                allergen.present ? styles.allergenPresent : styles.allergenAbsent
+                showWarning ? styles.allergenPresent : 
+                allergen.present ? styles.allergenDisabled : styles.allergenAbsent
               ]}
             >
+              <View style={styles.allergenNameContainer}>
+                <Text style={[
+                  styles.allergenName,
+                  showWarning ? styles.allergenPresentText : 
+                  allergen.present ? styles.allergenDisabledText : styles.allergenAbsentText
+                ]}>
+                  {allergen.name}
+                </Text>
+                {allergen.present && !isEnabled && (
+                  <Text style={styles.disabledLabel}>(monitoring disabled)</Text>
+                )}
+              </View>
               <Text style={[
-                styles.allergenName,
-                allergen.present ? styles.allergenPresentText : styles.allergenAbsentText
-              ]}>
-                {allergen.name}
-              </Text>
-              <Text style={[
-                styles.allergenStatus,
-                allergen.present ? styles.allergenPresentText : styles.allergenAbsentText
+                styles.allergenStatusText,
+                showWarning ? styles.allergenPresentText : 
+                allergen.present ? styles.allergenDisabledText : styles.allergenAbsentText
               ]}>
                 {allergen.present ? 'Present' : 'Not detected'}
               </Text>
             </View>
-          ))}
+            );
+          })}
         </View>
+        </>
       )}
     </View>
   );
@@ -188,6 +244,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#10B981',
   },
+  ingredientsToggle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  ingredientsToggleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  ingredientsSection: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+  },
+  ingredientsList: {
+    gap: 4,
+  },
+  ingredient: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+  },
   allergenDetails: {
     marginTop: 16,
     paddingTop: 16,
@@ -215,14 +301,33 @@ const styles = StyleSheet.create({
   allergenAbsent: {
     backgroundColor: '#F9FAFB',
   },
+  allergenDisabled: {
+    backgroundColor: '#FEF3C7',
+  },
+  allergenNameContainer: {
+    flex: 1,
+  },
   allergenName: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  disabledLabel: {
+    fontSize: 11,
+    color: '#92400e',
+    fontStyle: 'italic',
+    marginTop: 2,
   },
   allergenPresentText: {
     color: '#EF4444',
   },
   allergenAbsentText: {
     color: '#6b7280',
+  },
+  allergenDisabledText: {
+    color: '#92400e',
+  },
+  allergenStatusText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
