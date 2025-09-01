@@ -24,13 +24,10 @@ export default function ScannerScreen() {
       setScannedFood(food);
       setShowCamera(false);
     } else {
+      setScanned(false);
       Alert.alert(
         'Food Not Found',
-        'This barcode is not in our database. Try searching manually.',
-        [{ text: 'OK', onPress: () => {
-          setScanned(false);
-          // Keep camera open to scan again
-        }}]
+        'This barcode is not in our database. Try searching manually.'
       );
     }
   };
