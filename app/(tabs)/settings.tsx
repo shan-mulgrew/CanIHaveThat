@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { Settings as SettingsIcon, AlertTriangle, Info } from 'lucide-react-native';
+import { Settings as SettingsIcon, TriangleAlert as AlertTriangle, Info } from 'lucide-react-native';
 import { getAllergenSettings, updateAllergenSettings, type AllergenSettings } from '@/utils/allergenSettings';
 
 export default function SettingsScreen() {
