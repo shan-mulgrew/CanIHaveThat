@@ -27,9 +27,11 @@ export default function ScannerScreen() {
       Alert.alert(
         'Food Not Found',
         'This barcode is not in our database. Try searching manually.',
-        [{ text: 'OK', onPress: () => setScanned(false) }]
+        [{ text: 'OK', onPress: () => {
+          setScanned(false);
+          // Keep camera open to scan again
+        }}]
       );
-      setScanned(false);
     }
   };
 
