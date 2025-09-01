@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Search, Camera as CameraIcon, X } from 'lucide-react-native';
-import { getFoodByBarcode, searchFoods, type Food } from '@/utils/foodDatabase';
-import FoodCard from '@/components/FoodCard';
+import { getFoodByBarcode, searchFoods, type Food } from '../../utils/foodDatabase';
+import FoodCard from '../../components/FoodCard';
 
 export default function ScannerScreen() {
   const [hasPermission, requestPermission] = useCameraPermissions();

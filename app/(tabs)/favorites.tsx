@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Heart } from 'lucide-react-native';
-import { getFavorites, type Food } from '@/utils/foodDatabase';
-import FoodCard from '@/components/FoodCard';
+import { getFavorites, type Food } from '../../utils/foodDatabase';
+import FoodCard from '../../components/FoodCard';
 
 export default function FavoritesScreen() {
   const [favorites, setFavorites] = useState<Food[]>([]);

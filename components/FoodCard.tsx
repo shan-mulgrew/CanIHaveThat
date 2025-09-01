@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Heart, Shield, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, ChevronDown, ChevronUp } from 'lucide-react-native';
-import { type Food, toggleFavorite, toggleSafeFood, isInFavorites, isInSafeFoods } from '@/utils/foodDatabase';
-import { getAllergenSettings, type AllergenSettings } from '@/utils/allergenSettings';
+import { type Food, toggleFavorite, toggleSafeFood, isInFavorites, isInSafeFoods } from '../utils/foodDatabase';
+import { getAllergenSettings, type AllergenSettings } from '../utils/allergenSettings';
 
 interface FoodCardProps {
   food: Food;

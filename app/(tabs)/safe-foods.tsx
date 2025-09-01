@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Shield } from 'lucide-react-native';
-import { getSafeFoods, type Food } from '@/utils/foodDatabase';
-import FoodCard from '@/components/FoodCard';
+import { getSafeFoods, type Food } from '../../utils/foodDatabase';
+import FoodCard from '../../components/FoodCard';
 
 export default function SafeFoodsScreen() {
   const [safeFoods, setSafeFoods] = useState<Food[]>([]);
