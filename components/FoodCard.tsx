@@ -12,18 +12,28 @@ interface FoodCardProps {
 }
 
 export default function FoodCard({ food, detailed = false, onUpdate }: FoodCardProps) {
-  const [isFavorite, setIsFavorite] = useState(isInFavorites(food.id));
-  const [isSafe, setIsSafe] = useState(isInSafeFoods(food.id));
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSafe, setIsSafe] = useState(false);
   const [showIngredients, setShowIngredients] = useState(false);
   const [allergenSettings, setAllergenSettings] = useState<AllergenSettings>({});
 
   useEffect(() => {
     loadAllergenSettings();
+    loadFoodStatus();
   }, []);
 
   const loadAllergenSettings = async () => {
     const settings = await getAllergenSettings();
     setAllergenSettings(settings);
+  };
+
+  const loadFoodStatus = async () => {
+    const [favoriteStatus, safeStatus] = await Promise.all([
+      isInFavorites(food.id),
+      isInSafeFoods(food.id)
+    ]);
+    setIsFavorite(favoriteStatus);
+    setIsSafe(safeStatus);
   };
 
   const handleToggleFavorite = async () => {

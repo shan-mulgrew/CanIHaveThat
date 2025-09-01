@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { searchProductByBarcode, searchProductsByName, type OpenFoodFactsProduct } from './openFoodFactsApi';
 
 export interface Allergen {
   name: string;
@@ -14,213 +15,84 @@ export interface Food {
   allergens: Allergen[];
 }
 
-// Irish Top 7 Allergens
-const IRISH_ALLERGENS = [
-  'Cereals containing gluten',
-  'Crustaceans',
-  'Eggs',
-  'Fish',
-  'Peanuts',
-  'Soybeans',
-  'Milk',
-];
-
-// Mock food database
-const MOCK_FOODS: Food[] = [
-  {
-    id: '1',
-    name: 'Whole Wheat Bread',
-    brand: 'Brennans',
-    barcode: '5000169005057',
-    ingredients: [
-      'Wholemeal Wheat Flour',
-      'Water',
-      'Yeast',
-      'Salt',
-      'Wheat Gluten',
-      'Vegetable Fat',
-      'Sugar',
-      'Emulsifiers',
-      'Preservatives'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: true },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Fresh Salmon Fillet',
-    brand: 'SuperValu',
-    barcode: '5391531234567',
-    ingredients: [
-      'Fresh Atlantic Salmon (Salmo salar)',
-      'Water',
-      'Salt'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: true },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Natural Greek Yogurt',
-    brand: 'Glenisk',
-    barcode: '5391520654321',
-    ingredients: [
-      'Organic Whole Milk',
-      'Live Yogurt Cultures',
-      'Lactobacillus bulgaricus',
-      'Streptococcus thermophilus'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: true },
-    ],
-  },
-  {
-    id: '4',
-    name: 'Organic Free Range Eggs',
-    brand: 'Dunnes Stores',
-    barcode: '5391533987654',
-    ingredients: [
-      'Organic Free Range Eggs'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: true },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '5',
-    name: 'Peanut Butter',
-    brand: 'Whole Earth',
-    barcode: '5000169123456',
-    ingredients: [
-      'Roasted Peanuts (95%)',
-      'Sustainable Palm Oil',
-      'Sea Salt'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: true },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '6',
-    name: 'Soy Milk',
-    brand: 'Alpro',
-    barcode: '5411188123789',
-    ingredients: [
-      'Water',
-      'Hulled Soya Beans (2.9%)',
-      'Sugar',
-      'Calcium Carbonate',
-      'Sea Salt',
-      'Stabilisers',
-      'Vitamins'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: true },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '7',
-    name: 'Fresh Prawns',
-    brand: 'Tesco',
-    barcode: '5000169999999',
-    ingredients: [
-      'Fresh Water Prawns',
-      'Salt',
-      'Sodium Metabisulphite (Preservative)'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: true },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-  {
-    id: '8',
-    name: 'Organic Bananas',
-    brand: 'Fresh & Easy',
-    barcode: '5391531111111',
-    ingredients: [
-      'Organic Bananas'
-    ],
-    allergens: [
-      { name: 'Cereals containing gluten', present: false },
-      { name: 'Crustaceans', present: false },
-      { name: 'Eggs', present: false },
-      { name: 'Fish', present: false },
-      { name: 'Peanuts', present: false },
-      { name: 'Soybeans', present: false },
-      { name: 'Milk', present: false },
-    ],
-  },
-];
+// Irish Top 7 Allergens mapping to Open Food Facts allergen tags
+const IRISH_ALLERGEN_MAPPING: { [key: string]: string[] } = {
+  'Cereals containing gluten': ['en:gluten', 'gluten'],
+  'Crustaceans': ['en:crustaceans', 'crustaceans'],
+  'Eggs': ['en:eggs', 'eggs'],
+  'Fish': ['en:fish', 'fish'],
+  'Peanuts': ['en:peanuts', 'peanuts'],
+  'Soybeans': ['en:soybeans', 'soybeans', 'en:soy', 'soy'],
+  'Milk': ['en:milk', 'milk', 'en:dairy', 'dairy'],
+};
 
 const FAVORITES_KEY = 'allergen_scanner_favorites';
 const SAFE_FOODS_KEY = 'allergen_scanner_safe_foods';
 
-export const getFoodByBarcode = async (barcode: string): Promise<Food | null> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+const convertOpenFoodFactsToFood = (offProduct: OpenFoodFactsProduct): Food => {
+  const product = offProduct.product;
   
-  const food = MOCK_FOODS.find(f => f.barcode === barcode);
-  return food || null;
+  // Parse ingredients
+  const ingredients: string[] = [];
+  if (product.ingredients && Array.isArray(product.ingredients)) {
+    ingredients.push(...product.ingredients.map(ing => ing.text));
+  } else if (product.ingredients_text) {
+    // Fallback to parsing ingredients text
+    ingredients.push(...product.ingredients_text.split(',').map(ing => ing.trim()));
+  }
+
+  // Map allergens
+  const allergens: Allergen[] = Object.keys(IRISH_ALLERGEN_MAPPING).map(allergenName => {
+    const allergenTags = IRISH_ALLERGEN_MAPPING[allergenName];
+    const isPresent = product.allergens_tags?.some(tag => 
+      allergenTags.some(mappedTag => tag.includes(mappedTag))
+    ) || false;
+
+    return {
+      name: allergenName,
+      present: isPresent,
+    };
+  });
+
+  return {
+    id: offProduct.code,
+    name: product.product_name || 'Unknown Product',
+    brand: product.brands || 'Unknown Brand',
+    barcode: offProduct.code,
+    ingredients: ingredients.slice(0, 20), // Limit to first 20 ingredients
+    allergens,
+  };
 };
 
-export const searchFoods = (query: string): Food[] => {
-  const lowercaseQuery = query.toLowerCase();
-  return MOCK_FOODS.filter(food => 
-    food.name.toLowerCase().includes(lowercaseQuery) ||
-    food.brand.toLowerCase().includes(lowercaseQuery)
-  );
+export const getFoodByBarcode = async (barcode: string): Promise<Food | null> => {
+  try {
+    const offProduct = await searchProductByBarcode(barcode);
+    if (offProduct) {
+      return convertOpenFoodFactsToFood(offProduct);
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching food by barcode:', error);
+    return null;
+  }
+};
+
+export const searchFoods = async (query: string): Promise<Food[]> => {
+  try {
+    const offProducts = await searchProductsByName(query);
+    return offProducts.map(convertOpenFoodFactsToFood);
+  } catch (error) {
+    console.error('Error searching foods:', error);
+    return [];
+  }
 };
 
 export const getFavorites = async (): Promise<Food[]> => {
   try {
     const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
     if (favorites) {
-      const favoriteIds = JSON.parse(favorites);
-      return MOCK_FOODS.filter(food => favoriteIds.includes(food.id));
+      const favoriteData = JSON.parse(favorites);
+      return favoriteData;
     }
     return [];
   } catch (error) {
@@ -233,8 +105,8 @@ export const getSafeFoods = async (): Promise<Food[]> => {
   try {
     const safeFoods = await AsyncStorage.getItem(SAFE_FOODS_KEY);
     if (safeFoods) {
-      const safeIds = JSON.parse(safeFoods);
-      return MOCK_FOODS.filter(food => safeIds.includes(food.id));
+      const safeData = JSON.parse(safeFoods);
+      return safeData;
     }
     return [];
   } catch (error) {
@@ -246,18 +118,18 @@ export const getSafeFoods = async (): Promise<Food[]> => {
 export const toggleFavorite = async (food: Food): Promise<boolean> => {
   try {
     const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-    let favoriteIds = favorites ? JSON.parse(favorites) : [];
+    let favoriteData: Food[] = favorites ? JSON.parse(favorites) : [];
     
-    const isCurrentlyFavorite = favoriteIds.includes(food.id);
+    const existingIndex = favoriteData.findIndex(f => f.id === food.id);
     
-    if (isCurrentlyFavorite) {
-      favoriteIds = favoriteIds.filter((id: string) => id !== food.id);
+    if (existingIndex >= 0) {
+      favoriteData.splice(existingIndex, 1);
     } else {
-      favoriteIds.push(food.id);
+      favoriteData.push(food);
     }
     
-    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteIds));
-    return !isCurrentlyFavorite;
+    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteData));
+    return existingIndex < 0; // Return true if added, false if removed
   } catch (error) {
     console.error('Error toggling favorite:', error);
     return false;
@@ -267,32 +139,48 @@ export const toggleFavorite = async (food: Food): Promise<boolean> => {
 export const toggleSafeFood = async (food: Food): Promise<boolean> => {
   try {
     const safeFoods = await AsyncStorage.getItem(SAFE_FOODS_KEY);
-    let safeIds = safeFoods ? JSON.parse(safeFoods) : [];
+    let safeData: Food[] = safeFoods ? JSON.parse(safeFoods) : [];
     
-    const isCurrentlySafe = safeIds.includes(food.id);
+    const existingIndex = safeData.findIndex(f => f.id === food.id);
     
-    if (isCurrentlySafe) {
-      safeIds = safeIds.filter((id: string) => id !== food.id);
+    if (existingIndex >= 0) {
+      safeData.splice(existingIndex, 1);
     } else {
-      safeIds.push(food.id);
+      safeData.push(food);
     }
     
-    await AsyncStorage.setItem(SAFE_FOODS_KEY, JSON.stringify(safeIds));
-    return !isCurrentlySafe;
+    await AsyncStorage.setItem(SAFE_FOODS_KEY, JSON.stringify(safeData));
+    return existingIndex < 0; // Return true if added, false if removed
   } catch (error) {
     console.error('Error toggling safe food:', error);
     return false;
   }
 };
 
-export const isInFavorites = (foodId: string): boolean => {
-  // This is a synchronous check for initial state
-  // In a real app, you'd want to manage this state more carefully
-  return false;
+export const isInFavorites = async (foodId: string): Promise<boolean> => {
+  try {
+    const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
+    if (favorites) {
+      const favoriteData: Food[] = JSON.parse(favorites);
+      return favoriteData.some(f => f.id === foodId);
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking favorites:', error);
+    return false;
+  }
 };
 
-export const isInSafeFoods = (foodId: string): boolean => {
-  // This is a synchronous check for initial state
-  // In a real app, you'd want to manage this state more carefully
-  return false;
+export const isInSafeFoods = async (foodId: string): Promise<boolean> => {
+  try {
+    const safeFoods = await AsyncStorage.getItem(SAFE_FOODS_KEY);
+    if (safeFoods) {
+      const safeData: Food[] = JSON.parse(safeFoods);
+      return safeData.some(f => f.id === foodId);
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking safe foods:', error);
+    return false;
+  }
 };

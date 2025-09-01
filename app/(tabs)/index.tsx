@@ -53,9 +53,10 @@ export default function ScannerScreen() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.length > 2) {
-      const results = searchFoods(query);
-      setSearchResults(results);
-      setShowSearch(true);
+      searchFoods(query).then(results => {
+        setSearchResults(results);
+        setShowSearch(true);
+      });
     } else {
       setShowSearch(false);
       setSearchResults([]);
